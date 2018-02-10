@@ -1,17 +1,16 @@
  import java.io.File;
- import java.net.HttpURLConnection;
- import java.net.MalformedURLException;
+ import java.net.HttpURLConnection; 
  import java.net.URL;
  import java.io.*;
  import java.util.*;
+ 
 
 /**
  * GrammarApp contains a main program that prompts a user for the name of a
  * grammar file and then gives the user the opportunity to generate random
  * versions of various elements of the grammar.
+ * Test url (has been shortened): https://tinyurl.com/bgoldner4
  *
- * STUDENT TO DO:  Implement the loadRules() method
- *                 Modify main() to handle bad file input (reprompt the user)
  *
  * @author: B. Goldner, Heidi Valles
  * @version 02/13/2018
@@ -57,22 +56,7 @@ public class GrammarApp {
       return false;
     }
   }
-  
-  public static void main(String[] args) throws Exception {
-  
-    URL oracle = new URL(" http://facweb.northseattle.edu/bgoldner/CSC143/143HW/HW4-BNF/sentence.txt");
-    String sOracle = oracle.toString();
-    if (exists(sOracle)) {
-      BufferedReader in = new BufferedReader(
-        new InputStreamReader(oracle.openStream()));
-  
-      String inputLine;
-      while ((inputLine = in.readLine()) != null)
-        System.out.println(inputLine);
-      in.close();
-    }
-  }
-  /**
+ 
   public static void main(String[] args) throws IOException {
     Scanner keyboard = new Scanner(System.in);
   
@@ -80,20 +64,20 @@ public class GrammarApp {
     do {
       fileName = intro(keyboard);
       //checks to see if file name given by client is a local file or a web address
-      if (fileName.contains("http:")){
+      if (fileName.contains("http:") || fileName.contains("https:")) {
         System.out.println("Found URL. Checking for validity");
-        URL oracle = new URL(" http://facweb.northseattle.edu/bgoldner/CSC143/143HW/HW4-BNF/sentence.txt");
+        URL oracle = new URL(fileName);
         String sOracle = oracle.toString();
         if (exists(sOracle)) {
           BufferedReader in = new BufferedReader(
-          new InputStreamReader(oracle.openStream()));
+            new InputStreamReader(oracle.openStream()));
           String inputLine;
           while ((inputLine = in.readLine()) != null)
-           System.out.println(inputLine);
-           in.close();
-          }
-          URL url = new URL(fileName);
-          checkFile = new File(url.getFile());
+            System.out.println(inputLine);
+          in.close();
+          //if the web address is legal, get the file from there
+          checkFile = new File(oracle.getFile());
+        }
       }
       else {
         checkFile = new File(fileName);
