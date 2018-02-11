@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Supporting class for GrammarApp that will generate different grammars according to
@@ -6,7 +7,7 @@ import java.util.List;
  * @author Heidi Valles
  * @version 02/13/2018
  */
-public class GrammarGenerator {
+public class GrammarGenerator extends TreeMap {
   
   /**
    * Constructor is passed a grammar as a List of Strings and stores the List so as to
