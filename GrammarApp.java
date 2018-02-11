@@ -87,6 +87,7 @@ public class GrammarApp {
          for (String nme : checkSecond){
            values.add(nme);
          }
+         //
          treeMapT.put(first[0],values);
                 }
        Stream.of(treeMapT.values().toString()).forEach(System.out::println);
