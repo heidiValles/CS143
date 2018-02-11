@@ -1,7 +1,8 @@
  import java.io.File;
- import java.net.HttpURLConnection; 
+ import java.net.HttpURLConnection;
  import java.net.URL;
  import java.io.*;
+ import java.nio.file.Paths;
  import java.util.*;
  
 
@@ -43,12 +44,26 @@ public class GrammarApp {
    */
   public static boolean exists(String URLName){
     try {
-      HttpURLConnection.setFollowRedirects(false);
-      // note : you may also need
-      //        HttpURLConnection.setInstanceFollowRedirects(false)
-      HttpURLConnection con =
-        (HttpURLConnection) new URL(URLName).openConnection();
+      Properties systemSettings = System.getProperties();
+      systemSettings.put("proxySet", "true");
+      systemSettings.put("http.proxyHost","proxy.mycompany.local") ;
+      systemSettings.put("http.proxyPort", "80") ;
+    
+      URL u = new URL(URLName);
+      HttpURLConnection con = (HttpURLConnection) u.openConnection();
+      //
+      // it's not the greatest idea to use a sun.misc.* class
+      // Sun strongly advises not to use them since they can
+      // change or go away in a future release so beware.
+      //
+      sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+      String encodedUserPwd =
+        encoder.encode("domain\\username:password".getBytes());
+      con.setRequestProperty
+        ("Proxy-Authorization", "Basic " + encodedUserPwd);
       con.setRequestMethod("HEAD");
+      System.out.println
+        (con.getResponseCode() + " : " + con.getResponseMessage());
       return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
     }
     catch (Exception e) {
@@ -56,60 +71,64 @@ public class GrammarApp {
       return false;
     }
   }
- 
-  public static void main(String[] args) throws IOException {
-    Scanner keyboard = new Scanner(System.in);
   
-    //ask for new user input if file is not found
-    do {
-      fileName = intro(keyboard);
-      //checks to see if file name given by client is a local file or a web address
-      if (fileName.contains("http:") || fileName.contains("https:")) {
-        System.out.println("Found URL. Checking for validity");
-        URL oracle = new URL(fileName);
-        String sOracle = oracle.toString();
-        if (exists(sOracle)) {
-          BufferedReader in = new BufferedReader(
-            new InputStreamReader(oracle.openStream()));
-          String inputLine;
-          while ((inputLine = in.readLine()) != null)
-            System.out.println(inputLine);
-          in.close();
-          //if the web address is legal, get the file from there
-          checkFile = new File(oracle.getFile());
-        }
-      }
-      else {
-        checkFile = new File(fileName);
-      }
-      if (checkFile.exists()) {
-        fileExists = true;
-      } else {
-          System.out.println("File not found, please enter valid file name: ");
-        }
-      }
-    while (fileExists == false) ;
+   public static void main(String[] args) throws IOException {
+     Scanner keyboard = new Scanner(System.in);
+     //ask for new user input if file is not found
+     do {
+       fileName = intro(keyboard);
+       //checks to see if file name given by client is a local file or a web address
+       if (fileName.contains("http:") || fileName.contains("https:")) {
+         System.out.println("Found URL. Checking for validity");
+         URL oracle = new URL(fileName);
+         String sOracle = oracle.toString();
+         System.out.println(exists(fileName));
+         if (exists(sOracle)) {
+           checkFile = new File(oracle.getFile());
+           BufferedReader in = new BufferedReader(
+             new InputStreamReader(oracle.openStream()));
+           String inputLine;
+           while ((inputLine = in.readLine()) != null)
+             System.out.println(inputLine);
+           in.close();
+         }
+       }
+         else {
+           checkFile = new File(fileName);
+         }
+         if (checkFile.exists()) {
+           fileExists = true;
+         } else {
+           System.out.println("File not found, please enter valid file name: ");
+         }
+       
+     }
+     while (!fileExists);
+   
+       
     
-    // run through generating grammar if file is found
-    do {
-      System.out.println("File has been found");
-      List<String> grammar = loadRules(fileName);
-      // construct the grammar generator
-      GrammarGenerator gen =
-        new GrammarGenerator(grammar);
-      // interact with user to generate expressions from the loaded grammar
-      String target = getSymbol(keyboard, gen);
-      while (target.length() != 0) {
-        int count = getCount(keyboard);
-        String[] answers = gen.generate(target, count);
-        System.out.println("****************************************");
-        for (int i = 0; i < count; i++) {
-          System.out.println(answers[i]);
-        }
-        target = getSymbol(keyboard, gen);
-      }
-    } while (fileExists);
-  }
+       // run through generating grammar if file is found
+       do {
+         System.out.println("File has been found");
+         List<String> grammar = loadRules(fileName);
+         // construct the grammar generator
+         GrammarGenerator gen =
+           new GrammarGenerator(grammar);
+         // interact with user to generate expressions from the loaded grammar
+         String target = getSymbol(keyboard, gen);
+         while (target.length() != 0) {
+           int count = getCount(keyboard);
+           String[] answers = gen.generate(target, count);
+           System.out.println("****************************************");
+           for (int i = 0; i < count; i++) {
+             System.out.println(answers[i]);
+           }
+           target = getSymbol(keyboard, gen);
+         }
+       }
+       while (fileExists);
+     }
+   
   
     /**
      * Display introduction and prompt for grammar filename
