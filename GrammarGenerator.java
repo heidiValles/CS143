@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -7,18 +8,22 @@ import java.util.TreeMap;
  * @author Heidi Valles
  * @version 02/13/2018
  */
-public class GrammarGenerator extends TreeMap {
+public class GrammarGenerator{
+  public static Map<String, String[]> grammarTree; // TreeMap that stores values for
+  // each key
   
   /**
    * Constructor is passed a grammar as a List of Strings and stores the List so as to
    * later generate parts of the grammar
-   * @param Grammar in the file that client submits to program
+   * @param grammar in the file that client submits to program
    * @throws IllegalArgumentException if there are 2+ entries in the grammar for the
    * same non-terminal
    */
-  public GrammarGenerator(List<String> Grammar){
-  
-  }
+  public GrammarGenerator(List<String> grammar){
+    System.out.println(grammar.get(0));
+    
+    grammarTree = new TreeMap<>();
+      }
   
   /**
    * Checks to see if the given symbol is a non-terminal of the grammar
@@ -44,7 +49,7 @@ public class GrammarGenerator extends TreeMap {
    * Gets the non-terminal symbols in a file and returns them as a string
    * @return String representation of non-terminal symbols in a file
    */
-  public String getSymbols(){
-  return "a";
+  public String getSymbols() {
+    return ";";
   }
 }

@@ -6,9 +6,10 @@
  import java.nio.file.Files;
  import java.nio.file.Paths;
  import java.util.*;
- 
+ import java.util.stream.Stream;
 
-/**
+
+ /**
  * GrammarApp contains a main program that prompts a user for the name of a
  * grammar file and then gives the user the opportunity to generate random
  * versions of various elements of the grammar.
@@ -24,6 +25,7 @@ public class GrammarApp {
   public static File checkFile; //stores instances of fileName to check if they exist
   public static String fileName; //fileName entered by user
   public static List<String> grammar; //stores grammar syntax
+  public  static Map<String,List <String>> treeMapT = new TreeMap<>();
 
 
   
@@ -45,54 +47,67 @@ public class GrammarApp {
              .substring(oracle.getPath().lastIndexOf('/'));
            //Why will it only work if I add src? I tried moving all of my docs to a
            // higher level and it won't compile
-           String newFileDir =  userDir  + "\\src" + filePath;
-           newFileDir = newFileDir.replaceAll("/","\\\\");
+           String newFileDir = userDir + "\\src" + filePath;
+           newFileDir = newFileDir.replaceAll("/", "\\\\");
            //saving the text into a new file
            File newOnlineFile = new File(newFileDir);
            //sets the new File to be checked
            checkFile = newOnlineFile;
-  /**Makes sure that the file is being read properly
-           BufferedReader in = new BufferedReader(
-             new InputStreamReader(oracle.openStream()));
-           String inputLine;
-           while ((inputLine = in.readLine()) != null)
-             System.out.println(inputLine);
-           in.close();
-     */
+           /**Makes sure that the file is being read properly
+            BufferedReader in = new BufferedReader(
+            new InputStreamReader(oracle.openStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null)
+            System.out.println(inputLine);
+            in.close();
+            */
          }
+       } else {
+         checkFile = new File(fileName);
        }
-         else {
-           checkFile = new File(fileName);
-         }
-         if (checkFile.exists()) {
-           fileExists = true;
-         } else {
-           System.out.println("File not found, please enter valid file name: ");
-         }
-       
+       if (checkFile.exists()) {
+         fileExists = true;
+       } else {
+         System.out.println("File not found, please enter valid file name: ");
+       }
+  
      }
      while (!fileExists);
-     
+  
      // run through generating grammar if file is found
      do {
-       System.out.println("pastLR");
+       grammar = loadRules(fileName);
        // construct the grammar generator
-       GrammarGenerator gen =
-         new GrammarGenerator(grammar);
-       // interact with user to generate expressions from the loaded grammar
-       String target = getSymbol(keyboard, gen);
-       while (target.length() != 0) {
-         int count = getCount(keyboard);
-         String[] answers = gen.generate(target, count);
-         System.out.println("****************************************");
-         for (int i = 0; i < count; i++) {
-           System.out.println(answers[i]);
+       for (String line : grammar) {
+         String [] first = line.split(":");
+         String[] getSymbols = first[0].split("[|]");
+         String second = first[1];
+         String [] checkSecond = second.split("[|]");
+         List <String> values = new LinkedList<>();
+         for (String nme : checkSecond){
+           values.add(nme);
          }
-         target = getSymbol(keyboard, gen);
+         treeMapT.put(first[0],values);
+                }
+       Stream.of(treeMapT.values().toString()).forEach(System.out::println);
+         GrammarGenerator gen =
+           new GrammarGenerator(grammar);
+         // interact with user to generate expressions from the loaded grammar
+         String target = getSymbol(keyboard, gen);
+         while (target.length() != 0) {
+           int count = getCount(keyboard);
+           String[] answers = gen.generate(target, count);
+           System.out.println("****************************************");
+           for (int i = 0; i < count; i++) {
+             System.out.println(answers[i]);
+           }
+           target = getSymbol(keyboard, gen);
+         }
        }
+       while (fileExists) ;
      }
-     while (fileExists);
-   }
+   
+   
   
   /**
    * Method found online at:  http://www.rgagnon.com/javadetails/java-0059.html to see
@@ -134,13 +149,12 @@ public class GrammarApp {
    * @return ArrayList of rules from file given by client
    */
   public  static List<String> loadRules(String fileName) throws IOException{
-    System.out.println("in loadrulse");
     List<String> lines;
     lines = Files.readAllLines(Paths.get(fileName), Charset.forName("UTF-8"));
-    for(String line:lines) {
-      System.out.println(line);
+    //for(String line:lines) {
+      //System.out.println(line);
       //}
-    }
+    
     return lines;
   }
   
