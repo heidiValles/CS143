@@ -1,6 +1,5 @@
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Supporting class for GrammarApp that will generate different grammars according to
@@ -9,8 +8,8 @@ import java.util.TreeMap;
  * @version 02/13/2018
  */
 public class GrammarGenerator{
-  public static Map<String, String[]> grammarTree; // TreeMap that stores values for
-  // each key
+  public  static Map<String,List <String>> treeMapT = new TreeMap<>(); //new Treemap
+  String keys; //stores all keys
   
   /**
    * Constructor is passed a grammar as a List of Strings and stores the List so as to
@@ -19,11 +18,19 @@ public class GrammarGenerator{
    * @throws IllegalArgumentException if there are 2+ entries in the grammar for the
    * same non-terminal
    */
-  public GrammarGenerator(List<String> grammar){
-    System.out.println(grammar.get(0));
-    
-    grammarTree = new TreeMap<>();
+  public GrammarGenerator(List<String> grammar) {
+    for (String line : grammar) {
+      String[] first = line.split(":");
+      String second = first[1];
+      String[] checkSecond = second.split("[|]");
+      List<String> values = new LinkedList<>();
+      for (String nme : checkSecond) {
+        values.add(nme);
       }
+      //
+      treeMapT.put(first[0], values);
+    }
+  }
   
   /**
    * Checks to see if the given symbol is a non-terminal of the grammar
@@ -50,6 +57,7 @@ public class GrammarGenerator{
    * @return String representation of non-terminal symbols in a file
    */
   public String getSymbols() {
-    return ";";
+    keys = String.join(" ", treeMapT.keySet());
+  return keys;
   }
 }

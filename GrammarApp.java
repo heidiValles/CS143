@@ -20,12 +20,11 @@
 
 public class GrammarApp {
   
-  public static boolean fileExists = false; //stores boolean state of client's file
-  // existence
-  public static File checkFile; //stores instances of fileName to check if they exist
-  public static String fileName; //fileName entered by user
-  public static List<String> grammar; //stores grammar syntax
-  public  static Map<String,List <String>> treeMapT = new TreeMap<>();
+   public static boolean fileExists = false; //stores boolean state of client's file
+   // existence
+   public static File checkFile; //stores instances of fileName to check if they exist
+   public static String fileName; //fileName entered by user
+   public static List<String> grammar; //stores grammar syntax
 
 
   
@@ -78,19 +77,6 @@ public class GrammarApp {
      do {
        grammar = loadRules(fileName);
        // construct the grammar generator
-       for (String line : grammar) {
-         String [] first = line.split(":");
-         String[] getSymbols = first[0].split("[|]");
-         String second = first[1];
-         String [] checkSecond = second.split("[|]");
-         List <String> values = new LinkedList<>();
-         for (String nme : checkSecond){
-           values.add(nme);
-         }
-         //
-         treeMapT.put(first[0],values);
-                }
-       Stream.of(treeMapT.values().toString()).forEach(System.out::println);
          GrammarGenerator gen =
            new GrammarGenerator(grammar);
          // interact with user to generate expressions from the loaded grammar
@@ -151,7 +137,7 @@ public class GrammarApp {
    */
   public  static List<String> loadRules(String fileName) throws IOException{
     List<String> lines;
-    lines = Files.readAllLines(Paths.get(fileName), Charset.forName("UTF-8"));
+    lines = Files.readAllLines(Paths.get(fileName),Charset.defaultCharset() );
     //for(String line:lines) {
       //System.out.println(line);
       //}
